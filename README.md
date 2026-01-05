@@ -406,5 +406,6 @@ docker-compose up -d --build
 **Solución**: Inyectar el script manualmente con el contenedor encendido:
 ```bash
 docker cp db/init.sql algebra-relacional-db-1:/tmp/init.sql
-docker exec -it algebra-relacional-db-1 psql -U user -d algebra_db -f /tmp/init.sql```
+docker exec -it algebra-relacional-db-1 psql -U user -d algebra_db -f /tmp/init.sql
+```
 ---
