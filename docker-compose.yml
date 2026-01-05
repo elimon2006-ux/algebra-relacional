@@ -1,0 +1,24 @@
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: algebra_db
+    # volumes:  <--- BORRA O COMENTA ESTAS LÍNEAS
+    #   - ./db:/docker-entrypoint-initdb.d
+    ports:
+      - "5432:5432"
+# ... el resto sigue igual
+
+  app:
+    build: ./app
+    depends_on:
+      - db
+    environment:
+      DB_HOST: db
+      DB_NAME: algebra_db
+      DB_USER: user
+      DB_PASS: password
+    stdin_open: true
+    tty: true
