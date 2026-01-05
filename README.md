@@ -236,7 +236,7 @@ Cada consulta se presenta en **4 notaciones equivalentes**:
 ## 📂 Estructura del Repositorio
 
 ```
-practica-bd.algebra/
+practica-bd-algebra/
 ├── docker-compose.yml       # Orquestador de servicios (App + DB)
 ├── README.md                # Documentación principal (este archivo)
 ├── app/
@@ -261,8 +261,8 @@ practica-bd.algebra/
 #### 1️⃣ Clonar el repositorio
 
 ```bash
-git clone https://github.com/TU_USUARIO/proyecto-algebra-universitaria.git
-cd proyecto-algebra-universitaria
+git clone https://github.com/TU_USUARIO/practica-bd-algebra.git
+cd practica-bd-algebra
 ```
 
 #### 2️⃣ Construir y levantar los contenedores
@@ -276,8 +276,8 @@ docker-compose up -d --build
 **Salida esperada:**
 ```
 [+] Running 2/2
- ✔ Container practica-db-1   Started
- ✔ Container practica-app-1  Started
+ ✔ Container practica-bd-algebra-db-1   Started
+ ✔ Container practica-bd-algebra-app-1  Started
 ```
 
 #### 3️⃣ Acceder al menú interactivo
@@ -285,7 +285,7 @@ docker-compose up -d --build
 Una vez que los contenedores estén corriendo:
 
 ```bash
-docker attach practica-app-1
+docker attach practica-bd-algebra-app-1
 ```
 
 > **Nota**: Si no aparece el menú inmediatamente, presiona **ENTER** una vez.
@@ -366,8 +366,8 @@ ports:
 docker ps -a
 
 # Reiniciar contenedor
-docker start practica-app-1
-docker attach practica-app-1
+docker start practica-bd-algebra-app-1
+docker attach practica-bd-algebra-app-1
 ```
 
 ### ❌ "Esperando a la BD..." por más de 30 segundos
@@ -405,7 +405,7 @@ docker-compose up -d --build
 **Situación**: Si la automatización falla y la base de datos queda vacía.
 **Solución**: Inyectar el script manualmente con el contenedor encendido:
 ```bash
-docker cp db/init.sql algebra-relacional-db-1:/tmp/init.sql
-docker exec -it algebra-relacional-db-1 psql -U user -d algebra_db -f /tmp/init.sql
+docker cp db/init.sql practica-bd-algebra-1:/tmp/init.sql
+docker exec -it practica-bd-algebra-db-1 psql -U user -d algebra_db -f /tmp/init.sql
 ```
 ---
