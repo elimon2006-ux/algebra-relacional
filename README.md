@@ -12,9 +12,9 @@ El sistema está completamente dockerizado e incluye un menú interactivo en Pyt
 
 ## 👥 Integrantes del Equipo
 
-- **[Tu Nombre Completo]**
-- **[Nombre del Compañero 2]**
-- **[Nombre del Compañero 3]**
+- **Estrada Gónzalez Naomi Judith**
+- **Herrera Zaragoza Elizabeth**
+- **Romero **
 
 ---
 
@@ -71,41 +71,101 @@ PRERREQUISITOS (id_curso FK, id_prereq FK, tipo_requisito, fecha_vigencia)
 ---
 
 ## 📊 Diagrama Entidad-Relación Extendido (EER)
-
+```mermaid
+erDiagram
+    DEPARTAMENTOS ||--o{ PROFESORES : emplea
+    DEPARTAMENTOS ||--o{ ESTUDIANTES : inscribe
+    DEPARTAMENTOS ||--o{ CURSOS : ofrece
+    PROFESORES ||--o{ GRUPOS : imparte
+    CURSOS ||--o{ GRUPOS : se_divide_en
+    CURSOS ||--o{ PRERREQUISITOS : requiere
+    CURSOS ||--o{ PRERREQUISITOS : es_prerequisito_de
+    AULAS ||--o{ GRUPOS : aloja
+    GRUPOS ||--o{ INSCRIPCIONES : tiene
+    ESTUDIANTES ||--o{ INSCRIPCIONES : se_inscribe_en
+    
+    DEPARTAMENTOS {
+        string id_depto PK
+        string nombre
+        string edificio
+        decimal presupuesto
+    }
+    
+    PROFESORES {
+        string id_prof PK
+        string nombre
+        string email
+        string grado_academico
+        decimal salario
+        string id_depto FK
+    }
+    
+    ESTUDIANTES {
+        string id_est PK
+        string nombre
+        string email
+        int generacion
+        string id_depto FK
+    }
+    
+    CURSOS {
+        string id_curso PK
+        string nombre
+        int creditos
+        string semestre
+        string id_depto FK
+    }
+    
+    AULAS {
+        string id_aula PK
+        string edificio
+        int capacidad
+        string tipo
+    }
+    
+    GRUPOS {
+        string id_grupo PK
+        string horario
+        string semestre
+        int anio
+        string id_curso FK
+        string id_prof FK
+        string id_aula FK
+    }
+    
+    INSCRIPCIONES {
+        string id_est PK_FK
+        string id_grupo PK_FK
+        decimal calificacion
+        date fecha_inscripcion
+    }
+    
+    PRERREQUISITOS {
+        string id_curso PK_FK
+        string id_prereq PK_FK
+        string tipo_requisito
+        date fecha_vigencia
+    }
 ```
-                    ┌─────────────────┐
-                    │  DEPARTAMENTOS  │
-                    └────────┬────────┘
-                             │
-                ┌────────────┼────────────┐
-                │            │            │
-                │            │            │
-         ┌──────▼──────┐ ┌──▼──────┐ ┌──▼──────┐
-         │  PROFESORES │ │ CURSOS  │ │ESTUDIANTES│
-         └──────┬──────┘ └──┬──────┘ └──┬──────┘
-                │           │            │
-                │      ┌────▼─────┐      │
-                │      │PREREQ.   │      │
-                │      └──────────┘      │
-                │                        │
-                └────────┐   ┌───────────┘
-                         │   │
-                    ┌────▼───▼────┐
-                    │   GRUPOS    │
-                    └──────┬──────┘
-                           │
-                    ┌──────▼──────┐
-                    │INSCRIPCIONES│
-                    └─────────────┘
-                           │
-                    ┌──────▼──────┐
-                    │    AULAS    │
-                    └─────────────┘
-```
 
-**Nota**: Para el diagrama detallado con atributos y cardinalidades, consultar el archivo `diagrama_eer.png` en el repositorio.
+### Descripción de Relaciones
 
----
+- **DEPARTAMENTOS → PROFESORES** (1:N): Un departamento emplea múltiples profesores
+- **DEPARTAMENTOS → ESTUDIANTES** (1:N): Un departamento inscribe múltiples estudiantes
+- **DEPARTAMENTOS → CURSOS** (1:N): Un departamento ofrece múltiples cursos
+- **PROFESORES → GRUPOS** (1:N): Un profesor imparte múltiples grupos
+- **CURSOS → GRUPOS** (1:N): Un curso se divide en múltiples grupos
+- **AULAS → GRUPOS** (1:N): Un aula aloja múltiples grupos (en diferentes horarios)
+- **ESTUDIANTES ↔ GRUPOS** (N:M): Relación muchos a muchos través de INSCRIPCIONES
+- **CURSOS ↔ CURSOS** (N:M): Relación reflexiva a través de PRERREQUISITOS
+
+### Restricciones de Integridad
+
+- **Claves Primarias**: Todas las entidades tienen identificadores únicos
+- **Claves Foráneas**: Mantienen integridad referencial entre tablas
+- **NOT NULL**: Campos críticos como nombres, emails y fechas
+- **CHECK**: Validaciones de dominio (ej: calificación entre 0-10, salario > 0)
+- **UNIQUE**: Emails únicos para profesores y estudiantes
 
 ## 🧠 Consultas Implementadas (20 Operaciones)
 
