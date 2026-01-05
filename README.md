@@ -1,193 +1,340 @@
-Sistema Universitario – Gestión Académica con Álgebra Relacional y SQL 🎓
+# Sistema de Gestión Universitaria - Álgebra Relacional 🎓
 
-Este proyecto implementa un **sistema de base de datos para un entorno universitario**, demostrando la **equivalencia y aplicación práctica del Álgebra Relacional, el Cálculo Relacional y SQL estándar**.
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-blue.svg)](https://www.postgresql.org/)
+[![Python](https://img.shields.io/badge/Python-3.9-green.svg)](https://www.python.org/)
+[![Docker](https://img.shields.io/badge/Docker-Compose-2496ED.svg)](https://www.docker.com/)
 
-El sistema está **completamente dockerizado** e incluye un **menú interactivo en Python** que permite ejecutar y visualizar **20 consultas complejas**, cumpliendo con la **Modalidad B (Solo Repositorio)** de la práctica.
+Proyecto integral que implementa un **Sistema de Gestión Universitaria** demostrando la equivalencia y aplicación práctica entre **Álgebra Relacional**, **Cálculo Relacional de Tuplas**, **Cálculo Relacional de Dominios** y **SQL Estándar**.
+
+El sistema está completamente dockerizado e incluye un menú interactivo en Python para ejecutar y visualizar **20 consultas complejas** que cubren todos los operadores del álgebra relacional.
 
 ---
 
 ## 👥 Integrantes del Equipo
 
-* Estrada González Naomi Judith
-
-* Herrera Zaragoza Elizabeth
-
-* Romero Martínez Diego Enrique
-
-Grupo: **3CV2**
-Materia: **Bases de Datos**
-Profesor: **Hurtado Avilés Gabriel**
+- **[Tu Nombre Completo]**
+- **[Nombre del Compañero 2]**
+- **[Nombre del Compañero 3]**
 
 ---
 
 ## 📋 Descripción del Dominio
 
-El proyecto modela un **Sistema Universitario**, permitiendo la gestión y análisis de información académica realista, incluyendo:
+El proyecto modela el ecosistema completo de una **universidad**, gestionando:
 
-* **Estudiantes:** Datos personales y de control escolar.
-* **Profesores:** Información académica y adscripción a departamentos.
-* **Cursos:** Materias impartidas con créditos y prerrequisitos.
-* **Grupos:** Asignación de cursos a profesores y aulas.
-* **Inscripciones:** Relación entre estudiantes y grupos, con calificaciones.
-* **Departamentos:** Organización académica de profesores y cursos.
-* **Aulas:** Espacios físicos asignados a los grupos.
-
-Este dominio es ideal para formular consultas complejas con operadores relacionales, cuantificadores lógicos y agregaciones.
-
----
-
-## 🧩 Modelo Relacional (Esquema)
-
-DEPARTAMENTOS (id_departamento PK, nombre, edificio)
-
-PROFESORES (id_profesor PK, nombre, edad, especialidad, id_departamento FK)
-
-ESTUDIANTES (id_estudiante PK, nombre, edad, carrera, semestre)
-
-CURSOS (id_curso PK, nombre, creditos, id_departamento FK)
-
-PRERREQUISITOS (id_curso FK, id_prerrequisito FK)
-
-AULAS (id_aula PK, edificio, capacidad)
-
-GRUPOS (id_grupo PK, id_curso FK, id_profesor FK, id_aula FK, horario)
-
-INSCRIPCIONES (id_estudiante FK, id_grupo FK, calificacion, fecha_inscripcion)
-
-📌 El archivo `db/init.sql` contiene la creación del esquema y **más de 100 tuplas de datos de ejemplo**.
+- **Departamentos Académicos**: Organización administrativa con presupuestos y ubicaciones.
+- **Profesores**: Personal docente con grados académicos y salarios.
+- **Estudiantes**: Registro estudiantil con generaciones y adscripciones departamentales.
+- **Cursos**: Oferta académica con créditos y prerrequisitos.
+- **Grupos**: Secciones de cursos con horarios, aulas y asignación de profesores.
+- **Inscripciones**: Matrícula estudiantil con seguimiento de calificaciones.
+- **Aulas**: Infraestructura física clasificada por tipo y capacidad.
+- **Prerrequisitos**: Dependencias curriculares entre materias.
 
 ---
 
-## 📊 Diagrama del Esquema (EER)
+## 🗂️ Modelo Relacional (Esquema)
 
-El Diagrama Entidad–Relación Extendido representa las entidades del sistema, sus relaciones y cardinalidades, sirviendo como base para el modelo relacional implementado.
+### Relaciones Principales
+
+```
+DEPARTAMENTOS (id_depto PK, nombre, edificio, presupuesto)
+PROFESORES (id_prof PK, nombre, email, grado_academico, salario, id_depto FK)
+ESTUDIANTES (id_est PK, nombre, email, generacion, id_depto FK)
+CURSOS (id_curso PK, nombre, creditos, semestre, id_depto FK)
+AULAS (id_aula PK, edificio, capacidad, tipo)
+GRUPOS (id_grupo PK, horario, semestre, anio, id_curso FK, id_prof FK, id_aula FK)
+INSCRIPCIONES (id_est FK, id_grupo FK, calificacion, fecha_inscripcion)
+PRERREQUISITOS (id_curso FK, id_prereq FK, tipo_requisito, fecha_vigencia)
+```
+
+### Cardinalidades y Restricciones
+
+- **1:N** - Un departamento tiene múltiples profesores/estudiantes/cursos
+- **N:M** - Estudiantes se inscriben en múltiples grupos (tabla asociativa: `INSCRIPCIONES`)
+- **N:M** - Cursos pueden tener múltiples prerrequisitos (tabla asociativa: `PRERREQUISITOS`)
+- **1:1** - Un grupo se imparte en un aula específica por semestre
+
+### Datos de Prueba
+
+- **8 tablas** interconectadas
+- **100+ tuplas** distribuidas realísticamente:
+  - 5 Departamentos
+  - 15 Profesores
+  - 25 Estudiantes
+  - 20 Cursos
+  - 10 Aulas
+  - 30 Grupos
+  - 50+ Inscripciones
+  - 15 Prerrequisitos
+
+---
+
+## 📊 Diagrama Entidad-Relación Extendido (EER)
+
+```
+                    ┌─────────────────┐
+                    │  DEPARTAMENTOS  │
+                    └────────┬────────┘
+                             │
+                ┌────────────┼────────────┐
+                │            │            │
+                │            │            │
+         ┌──────▼──────┐ ┌──▼──────┐ ┌──▼──────┐
+         │  PROFESORES │ │ CURSOS  │ │ESTUDIANTES│
+         └──────┬──────┘ └──┬──────┘ └──┬──────┘
+                │           │            │
+                │      ┌────▼─────┐      │
+                │      │PREREQ.   │      │
+                │      └──────────┘      │
+                │                        │
+                └────────┐   ┌───────────┘
+                         │   │
+                    ┌────▼───▼────┐
+                    │   GRUPOS    │
+                    └──────┬──────┘
+                           │
+                    ┌──────▼──────┐
+                    │INSCRIPCIONES│
+                    └─────────────┘
+                           │
+                    ┌──────▼──────┐
+                    │    AULAS    │
+                    └─────────────┘
+```
+
+**Nota**: Para el diagrama detallado con atributos y cardinalidades, consultar el archivo `diagrama_eer.png` en el repositorio.
+
+---
+
+## 🧠 Consultas Implementadas (20 Operaciones)
+
+El sistema cubre **todas las operaciones** del álgebra relacional organizadas en 5 categorías:
+
+### 📌 Grupo 1: Operadores Básicos (5 consultas)
+
+| ID | Operador | Descripción |
+|----|----------|-------------|
+| 1 | **Selección (σ)** | Estudiantes del departamento de ISC |
+| 2 | **Proyección (π)** | Nombre y salario de profesores con salario > 40,000 |
+| 3 | **Unión (∪)** | Lista unificada de correos electrónicos |
+| 4 | **Diferencia (−)** | Cursos sin prerrequisitos asignados |
+| 5 | **Producto Cartesiano (×)** | Todas las combinaciones estudiante-curso |
+
+### 🔗 Grupo 2: Operadores de Reunión (5 consultas)
+
+| ID | Operador | Descripción |
+|----|----------|-------------|
+| 6 | **Reunión Natural (⋈)** | Estudiantes con sus calificaciones (3 tablas) |
+| 7 | **Left Outer Join (⟕)** | Todos los departamentos, incluso sin estudiantes |
+| 8 | **Theta Join (⋈θ)** | Grupos impartidos por profesores con salario > 40K |
+| 9 | **Semi-Join (⋉)** | Estudiantes con al menos una inscripción |
+| 10 | **Self Join** | Pares de estudiantes de la misma generación |
+
+### 📊 Grupo 3: Agrupación y Agregación (5 consultas)
+
+| ID | Función | Descripción |
+|----|---------|-------------|
+| 11 | **AVG** | Promedio de salario por departamento |
+| 12 | **COUNT** | Número de estudiantes por departamento |
+| 13 | **SUM + HAVING** | Departamentos con presupuesto total > 1,000,000 |
+| 14 | **MAX** | Calificación más alta registrada |
+| 15 | **COUNT DISTINCT** | Departamentos con cursos asignados |
+
+### ➗ Grupo 4: División (3 consultas)
+
+| ID | Escenario | Descripción |
+|----|-----------|-------------|
+| 16 | **División ÷ (Caso 1)** | Estudiantes que completaron TODOS los cursos de IA |
+| 17 | **División ÷ (Caso 2)** | Estudiantes que completaron TODAS las ciencias básicas |
+| 18 | **División ÷ (Caso 3)** | Profesores que impartieron en TODOS los laboratorios |
+
+### 🔍 Grupo 5: Cuantificadores Universales (2 consultas)
+
+| ID | Cuantificador | Descripción |
+|----|---------------|-------------|
+| 19 | **∀ (Para todo)** | Departamentos donde TODOS los profesores son doctores |
+| 20 | **∀ (Para todo)** | Estudiantes que aprobaron TODAS sus materias |
+
+---
+
+## 🎯 Equivalencias Teóricas
+
+Cada consulta se presenta en **4 notaciones equivalentes**:
+
+### Ejemplo: Consulta #1 - Selección
+
+| Lenguaje | Expresión |
+|----------|-----------|
+| **Álgebra Relacional** | `σ id_depto='ISC' (ESTUDIANTES)` |
+| **Cálculo de Tuplas** | `{t \| ESTUDIANTES(t) ∧ t.id_depto = 'ISC'}` |
+| **Cálculo de Dominios** | `{<id,n,e,g,d> \| <id,n,e,g,d> ∈ ESTUDIANTES ∧ d = 'ISC'}` |
+| **SQL** | `SELECT * FROM estudiantes WHERE id_depto = 'ISC';` |
 
 ---
 
 ## 📂 Estructura del Repositorio
 
 ```
-practica-bd-algebra/
-├── docker-compose.yml      # Orquestador de servicios (App + DB)
-├── README.md               # Documentación principal
+proyecto-algebra-universitaria/
+├── docker-compose.yml       # Orquestador de servicios (App + DB)
+├── README.md                # Documentación principal (este archivo)
+├── diagrama_eer.png         # Diagrama Entidad-Relación visual
 ├── app/
-│   ├── Dockerfile          # Imagen de la aplicación Python
-│   ├── main.py             # Menú interactivo de consultas
-│   └── requirements.txt    # Dependencias (psycopg2, tabulate)
+│   ├── Dockerfile           # Imagen Python para la aplicación
+│   ├── main.py              # Menú interactivo con 20 consultas
+│   └── requirements.txt     # Dependencias (psycopg2, tabulate)
 └── db/
-    └── init.sql            # Esquema y datos de la base de datos
+    └── init.sql             # Script DDL/DML: Creación de tablas y datos
 ```
 
 ---
 
 ## 🚀 Instalación y Ejecución
 
-Este proyecto utiliza **Docker y Docker Compose**, por lo que **no es necesario instalar PostgreSQL ni Python localmente**.
-
 ### Prerrequisitos
 
-* Docker Desktop (o Docker Engine + Docker Compose)
+- **Docker Desktop** (v20.10+) o **Docker Engine + Docker Compose**
+- **Git** (para clonar el repositorio)
 
-### Pasos para ejecutar
+### Pasos de Instalación
 
-1. Clonar el repositorio:
+#### 1️⃣ Clonar el repositorio
 
-   ```bash
-   git clone <URL_DE_TU_REPOSITORIO>
-   cd practica-bd-algebra
-   ```
+```bash
+git clone https://github.com/TU_USUARIO/proyecto-algebra-universitaria.git
+cd proyecto-algebra-universitaria
+```
 
-2. Construir y levantar los contenedores:
+#### 2️⃣ Construir y levantar los contenedores
 
-   ```bash
-   docker-compose up -d --build
-   ```
+Este comando descarga PostgreSQL 15, construye la aplicación Python e inicializa automáticamente la base de datos con el esquema y datos de prueba:
 
-   Este comando:
+```bash
+docker-compose up -d --build
+```
 
-   * Descarga la imagen de PostgreSQL
-   * Construye la aplicación en Python
-   * Inicializa automáticamente la base de datos
+**Salida esperada:**
+```
+[+] Running 2/2
+ ✔ Container proyecto-db-1   Started
+ ✔ Container proyecto-app-1  Started
+```
 
-3. Ingresar al menú interactivo:
+#### 3️⃣ Acceder al menú interactivo
 
-   ```bash
-   docker attach universidad_menu
-   ```
+Una vez que los contenedores estén corriendo:
 
-   *(Si el menú no aparece de inmediato, presiona ENTER una vez)*
+```bash
+docker attach proyecto-app-1
+```
 
-4. Detener el sistema:
+> **Nota**: Si no aparece el menú inmediatamente, presiona **ENTER** una vez.
 
-   ```bash
-   docker-compose down
-   ```
+#### 4️⃣ Navegar por el menú
 
----
+```
+=== PRACTICA 6, 7 Y 8: Operaciones del Álgebra Relacional ===
+--- Básicas ---
+1. Selección (σ)
+2. Proyección (π)
+3. Unión (∪)
+4. Diferencia (-)
+5. Producto Cartesiano (×)
+...
+0. Salir
+Selección: _
+```
 
-## 🧠 Consultas Implementadas
+Ingresa el número de la consulta que deseas ejecutar. El sistema mostrará:
+- La expresión en **Álgebra Relacional**
+- La expresión en **Cálculo de Tuplas**
+- La expresión en **Cálculo de Dominios**
+- El **SQL equivalente**
+- Los **resultados** en formato tabla
 
-El sistema incluye **20 consultas**, clasificadas por tipo de operación:
+#### 5️⃣ Detener el sistema
 
-| Categoría            | Operadores / Conceptos    | Descripción                                      |
-| -------------------- | ------------------------- | ------------------------------------------------ |
-| Operadores Básicos   | σ, π, ∪, ∩, −             | Selección, proyección y operaciones de conjuntos |
-| Reuniones            | ⋈, ⟕, ▹, Self-Join        | Consultas con múltiples tablas                   |
-| Agregación           | COUNT, SUM, AVG, GROUP BY | Estadísticas académicas                          |
-| División             | ÷ (simulada)              | Consultas de totalidad                           |
-| Lógica de Predicados | ∀, ∃                      | Cuantificadores universales y existenciales      |
+Para apagar los contenedores y liberar recursos:
 
-Cada consulta se muestra en el menú con:
-
-* Descripción en lenguaje natural
-* Expresión en Álgebra Relacional
-* Expresión en CRT y CRD
-* Consulta SQL equivalente
-* Resultado en pantalla
-
----
-
-## 🎓 Equivalencias Teóricas
-
-Este proyecto demuestra la traducción directa de operadores formales a SQL:
-
-| Operador   | Símbolo | Concepto              | Implementación SQL |
-| ---------- | ------- | --------------------- | ------------------ |
-| Selección  | σ       | Filtrado de filas     | WHERE              |
-| Proyección | π       | Selección de columnas | SELECT             |
-| Reunión    | ⋈       | Combinación de tablas | JOIN               |
-| Agrupación | γ       | Agrupar resultados    | GROUP BY           |
-| División   | ÷       | "Para todo"           | NOT EXISTS         |
-| Diferencia | −       | Resta de conjuntos    | EXCEPT             |
+```bash
+docker-compose down
+```
 
 ---
 
-## 🛠 Tecnologías Utilizadas
+## 🛠️ Tecnologías Utilizadas
 
-* **PostgreSQL 15** – Sistema gestor de base de datos
-* **Python 3** – Interfaz de línea de comandos (CLI)
-* **psycopg2** – Conector PostgreSQL para Python
-* **Docker & Docker Compose** – Contenerización
-* **Git** – Control de versiones
+| Tecnología | Versión | Propósito |
+|------------|---------|-----------|
+| **PostgreSQL** | 15 | Motor de base de datos relacional |
+| **Python** | 3.9 | Lenguaje para CLI interactiva |
+| **Psycopg2** | 2.9+ | Adaptador PostgreSQL para Python |
+| **Tabulate** | 0.9+ | Formateo de tablas en consola |
+| **Docker** | 20.10+ | Contenerización y aislamiento |
+| **Docker Compose** | 2.0+ | Orquestación multi-contenedor |
 
 ---
 
 ## 🔧 Solución de Problemas Comunes
 
-**Puerto 5432 ocupado**
-Si PostgreSQL está instalado localmente, Docker puede fallar.
+### ❌ Error: "puerto 5432 ya está en uso"
 
-* Solución: Detener el servicio local o cambiar el puerto en `docker-compose.yml`.
+**Causa**: PostgreSQL instalado localmente está ocupando el puerto.
 
-**El menú no aparece**
+**Solución 1** (Recomendada): Detener el servicio local de PostgreSQL:
+```bash
+# En Linux/Mac
+sudo systemctl stop postgresql
 
-* Presiona ENTER una vez después de `docker attach`.
+# En Windows
+net stop postgresql-x64-15
+```
 
-**Error de conexión a la base de datos**
+**Solución 2**: Cambiar el puerto en `docker-compose.yml`:
+```yaml
+ports:
+  - "5433:5432"  # Usar 5433 en el host
+```
 
-* Verifica que el contenedor de la base de datos esté activo con `docker ps`.
+### ❌ El menú se cierra inmediatamente
+
+**Causa**: El contenedor de la aplicación se detuvo.
+
+**Solución**:
+```bash
+# Verificar estado
+docker ps -a
+
+# Reiniciar contenedor
+docker start proyecto-app-1
+docker attach proyecto-app-1
+```
+
+### ❌ "Esperando a la BD..." por más de 30 segundos
+
+**Causa**: El contenedor de PostgreSQL no inició correctamente.
+
+**Solución**:
+```bash
+# Ver logs de la base de datos
+docker logs proyecto-db-1
+
+# Reiniciar todo el stack
+docker-compose down
+docker-compose up -d --build
+```
+
+### ❌ Error al construir la imagen Python
+
+**Causa**: Problemas de red o caché corrupta de Docker.
+
+**Solución**:
+```bash
+# Limpiar caché y reconstruir
+docker-compose down
+docker system prune -a
+docker-compose up -d --build
+```
 
 ---
-
-📌 **Fecha de entrega:** 19 de diciembre de 2025
-✔️ **Modalidad B – Solo Repositorio**
