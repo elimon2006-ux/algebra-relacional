@@ -1,154 +1,193 @@
-# Sistema Universitario: Álgebra Relacional y SQL
+Sistema Universitario – Gestión Académica con Álgebra Relacional y SQL 🎓
 
-**Proyecto Final - Bases de Datos** *Escuela Superior de Cómputo (ESCOM - IPN)*
+Este proyecto implementa un **sistema de base de datos para un entorno universitario**, demostrando la **equivalencia y aplicación práctica del Álgebra Relacional, el Cálculo Relacional y SQL estándar**.
 
-Este repositorio contiene la implementación de un **Caso Integrador** para la materia de Bases de Datos. El proyecto modela un sistema de gestión universitaria y demuestra la equivalencia entre cuatro lenguajes de consulta: **Álgebra Relacional**, **Cálculo Relacional de Tuplas**, **Cálculo Relacional de Dominios** y **SQL**.
+El sistema está **completamente dockerizado** e incluye un **menú interactivo en Python** que permite ejecutar y visualizar **20 consultas complejas**, cumpliendo con la **Modalidad B (Solo Repositorio)** de la práctica.
 
 ---
 
 ## 👥 Integrantes del Equipo
 
-* **González Estrada Naomi**
-* **Herrera Zaragoza Elizabeth**
-* **Romero Diego**
-* **Grupo:** 3CV2
+* Estrada González Naomi Judith
+
+* Herrera Zaragoza Elizabeth
+
+* Romero Martínez Diego Enrique
+
+Grupo: **3CV2**
+Materia: **Bases de Datos**
+Profesor: **Hurtado Avilés Gabriel**
 
 ---
 
-## 🏛️ Descripción del Dominio
+## 📋 Descripción del Dominio
 
-El sistema modela la información académica de una universidad, gestionando:
-* **Departamentos:** Entidades administrativas (ej. Sistemas, IA, Básicas).
-* **Profesores y Estudiantes:** Vinculados a departamentos.
-* **Cursos y Prerrequisitos:** Malla curricular y seriación.
-* **Grupos y Aulas:** Programación académica (horarios y espacios físicos).
-* **Inscripciones:** Historial académico y calificaciones.
+El proyecto modela un **Sistema Universitario**, permitiendo la gestión y análisis de información académica realista, incluyendo:
 
-El objetivo principal es ejecutar consultas de alta complejidad (incluyendo **División Relacional** y **Cuantificadores Universales**) mediante un menú interactivo.
+* **Estudiantes:** Datos personales y de control escolar.
+* **Profesores:** Información académica y adscripción a departamentos.
+* **Cursos:** Materias impartidas con créditos y prerrequisitos.
+* **Grupos:** Asignación de cursos a profesores y aulas.
+* **Inscripciones:** Relación entre estudiantes y grupos, con calificaciones.
+* **Departamentos:** Organización académica de profesores y cursos.
+* **Aulas:** Espacios físicos asignados a los grupos.
+
+Este dominio es ideal para formular consultas complejas con operadores relacionales, cuantificadores lógicos y agregaciones.
 
 ---
 
-## 📊 Diagrama Entidad-Relación Extendido (EER)
+## 🧩 Modelo Relacional (Esquema)
 
-El siguiente diagrama ilustra la estructura de la base de datos y las relaciones entre las entidades (Cardinalidad y Foreign Keys).
+DEPARTAMENTOS (id_departamento PK, nombre, edificio)
 
-```mermaid
-erDiagram
-    DEPARTAMENTOS ||--|{ PROFESORES : emplea
-    DEPARTAMENTOS ||--|{ ESTUDIANTES : inscribe
-    DEPARTAMENTOS ||--|{ CURSOS : oferta
-    
-    CURSOS ||--|{ GRUPOS : programa
-    CURSOS ||--|{ PRERREQUISITOS : requiere
-    
-    PROFESORES ||--|{ GRUPOS : imparte
-    
-    AULAS ||--|{ GRUPOS : aloja
-    
-    ESTUDIANTES ||--|{ INSCRIPCIONES : cursa
-    GRUPOS ||--|{ INSCRIPCIONES : tiene
+PROFESORES (id_profesor PK, nombre, edad, especialidad, id_departamento FK)
 
-    DEPARTAMENTOS {
-        string id_depto PK
-        string nombre
-        decimal presupuesto
-        string edificio
-    }
+ESTUDIANTES (id_estudiante PK, nombre, edad, carrera, semestre)
 
-    ESTUDIANTES {
-        int id_est PK
-        string nombre
-        string email
-        int generacion
-        string id_depto FK
-    }
+CURSOS (id_curso PK, nombre, creditos, id_departamento FK)
 
-    PROFESORES {
-        int id_prof PK
-        string nombre
-        string grado
-        decimal salario
-        string id_depto FK
-    }
+PRERREQUISITOS (id_curso FK, id_prerrequisito FK)
 
-    CURSOS {
-        string id_curso PK
-        string nombre
-        int creditos
-        string id_depto FK
-    }
+AULAS (id_aula PK, edificio, capacidad)
 
-    GRUPOS {
-        int id_grupo PK
-        string id_curso FK
-        int id_prof FK
-        string id_aula FK
-        string semestre
-    }
+GRUPOS (id_grupo PK, id_curso FK, id_profesor FK, id_aula FK, horario)
 
-    INSCRIPCIONES {
-        int id_est PK,FK
-        int id_grupo PK,FK
-        decimal calificacion
-    }
+INSCRIPCIONES (id_estudiante FK, id_grupo FK, calificacion, fecha_inscripcion)
 
-    🚀 Instalación y Ejecución
-Este proyecto está Dockerizado para facilitar su despliegue sin necesidad de configurar PostgreSQL o Python manualmente.
+📌 El archivo `db/init.sql` contiene la creación del esquema y **más de 100 tuplas de datos de ejemplo**.
 
-Prerrequisitos
-Tener instalado Docker Desktop y Docker Compose.
+---
 
-Pasos para ejecutar
-Clonar o descargar este repositorio.
+## 📊 Diagrama del Esquema (EER)
 
-Abrir una terminal en la carpeta raíz del proyecto.
+El Diagrama Entidad–Relación Extendido representa las entidades del sistema, sus relaciones y cardinalidades, sirviendo como base para el modelo relacional implementado.
 
-Ejecutar el siguiente comando para construir los contenedores y cargar la base de datos:
+---
 
-Bash
+## 📂 Estructura del Repositorio
 
-docker-compose up --build
-Acceder al Menú Interactivo: Una vez que veas que la base de datos se ha iniciado, abre una nueva terminal y ejecuta:
+```
+practica-bd-algebra/
+├── docker-compose.yml      # Orquestador de servicios (App + DB)
+├── README.md               # Documentación principal
+├── app/
+│   ├── Dockerfile          # Imagen de la aplicación Python
+│   ├── main.py             # Menú interactivo de consultas
+│   └── requirements.txt    # Dependencias (psycopg2, tabulate)
+└── db/
+    └── init.sql            # Esquema y datos de la base de datos
+```
 
-Bash
+---
 
-docker attach practica-bd-algebra-app-1
-(Nota: Si no ves el menú inmediatamente, presiona ENTER una vez).
+## 🚀 Instalación y Ejecución
 
-📂 Estructura del Proyecto
-app/main.py: Código fuente en Python. Contiene el menú interactivo y la definición de las 20 consultas con sus expresiones matemáticas.
+Este proyecto utiliza **Docker y Docker Compose**, por lo que **no es necesario instalar PostgreSQL ni Python localmente**.
 
-db/init.sql: Script SQL. Crea las 8 tablas e inserta más de 100 tuplas de datos de prueba automáticamente al iniciar.
+### Prerrequisitos
 
-Dockerfile: Define el entorno de Python con las librerías necesarias (psycopg2, tabulate).
+* Docker Desktop (o Docker Engine + Docker Compose)
 
-docker-compose.yml: Orquesta los servicios de la Base de Datos (Postgres) y la Aplicación (Python).
+### Pasos para ejecutar
 
-📝 Catálogo de Consultas
-El sistema permite ejecutar 20 consultas complejas clasificadas en 5 categorías, cumpliendo con la rúbrica de evaluación:
+1. Clonar el repositorio:
 
-Operadores Básicos: Selección, Proyección, Unión, Diferencia, Producto Cartesiano.
+   ```bash
+   git clone <URL_DE_TU_REPOSITORIO>
+   cd practica-bd-algebra
+   ```
 
-Reuniones (Joins): Natural Join, Left Join, Theta Join, Semi-Join, Self-Join.
+2. Construir y levantar los contenedores:
 
-Agregación y Agrupación: GROUP BY, HAVING, Promedios, Conteos.
+   ```bash
+   docker-compose up -d --build
+   ```
 
-División Relacional (÷):
+   Este comando:
 
-Ejemplo: "Estudiantes que han tomado TODOS los cursos del área de Inteligencia Artificial".
+   * Descarga la imagen de PostgreSQL
+   * Construye la aplicación en Python
+   * Inicializa automáticamente la base de datos
 
-Cuantificadores Universales (∀):
+3. Ingresar al menú interactivo:
 
-Ejemplo: "Estudiantes que han aprobado todas sus materias".
+   ```bash
+   docker attach universidad_menu
+   ```
 
-Cada resultado muestra en pantalla:
+   *(Si el menú no aparece de inmediato, presiona ENTER una vez)*
 
-Expresión en Álgebra Relacional.
+4. Detener el sistema:
 
-Expresión en Cálculo Relacional de Tuplas.
+   ```bash
+   docker-compose down
+   ```
 
-Expresión en Cálculo Relacional de Dominios.
+---
 
-Consulta SQL equivalente.
+## 🧠 Consultas Implementadas
 
-Tabla de Resultados.
+El sistema incluye **20 consultas**, clasificadas por tipo de operación:
+
+| Categoría            | Operadores / Conceptos    | Descripción                                      |
+| -------------------- | ------------------------- | ------------------------------------------------ |
+| Operadores Básicos   | σ, π, ∪, ∩, −             | Selección, proyección y operaciones de conjuntos |
+| Reuniones            | ⋈, ⟕, ▹, Self-Join        | Consultas con múltiples tablas                   |
+| Agregación           | COUNT, SUM, AVG, GROUP BY | Estadísticas académicas                          |
+| División             | ÷ (simulada)              | Consultas de totalidad                           |
+| Lógica de Predicados | ∀, ∃                      | Cuantificadores universales y existenciales      |
+
+Cada consulta se muestra en el menú con:
+
+* Descripción en lenguaje natural
+* Expresión en Álgebra Relacional
+* Expresión en CRT y CRD
+* Consulta SQL equivalente
+* Resultado en pantalla
+
+---
+
+## 🎓 Equivalencias Teóricas
+
+Este proyecto demuestra la traducción directa de operadores formales a SQL:
+
+| Operador   | Símbolo | Concepto              | Implementación SQL |
+| ---------- | ------- | --------------------- | ------------------ |
+| Selección  | σ       | Filtrado de filas     | WHERE              |
+| Proyección | π       | Selección de columnas | SELECT             |
+| Reunión    | ⋈       | Combinación de tablas | JOIN               |
+| Agrupación | γ       | Agrupar resultados    | GROUP BY           |
+| División   | ÷       | "Para todo"           | NOT EXISTS         |
+| Diferencia | −       | Resta de conjuntos    | EXCEPT             |
+
+---
+
+## 🛠 Tecnologías Utilizadas
+
+* **PostgreSQL 15** – Sistema gestor de base de datos
+* **Python 3** – Interfaz de línea de comandos (CLI)
+* **psycopg2** – Conector PostgreSQL para Python
+* **Docker & Docker Compose** – Contenerización
+* **Git** – Control de versiones
+
+---
+
+## 🔧 Solución de Problemas Comunes
+
+**Puerto 5432 ocupado**
+Si PostgreSQL está instalado localmente, Docker puede fallar.
+
+* Solución: Detener el servicio local o cambiar el puerto en `docker-compose.yml`.
+
+**El menú no aparece**
+
+* Presiona ENTER una vez después de `docker attach`.
+
+**Error de conexión a la base de datos**
+
+* Verifica que el contenedor de la base de datos esté activo con `docker ps`.
+
+---
+
+📌 **Fecha de entrega:** 19 de diciembre de 2025
+✔️ **Modalidad B – Solo Repositorio**
