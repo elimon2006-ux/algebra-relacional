@@ -11,10 +11,10 @@ El sistema está completamente dockerizado e incluye un menú interactivo en Pyt
 ---
 
 ## 👥 Integrantes del Equipo
-
+ 
 - **Estrada Gónzalez Naomi Judith**
 - **Herrera Zaragoza Elizabeth**
-- **Romero **
+- **Romero Martinez Diego Enrique**
 
 ---
 
@@ -239,7 +239,6 @@ Cada consulta se presenta en **4 notaciones equivalentes**:
 proyecto-algebra-universitaria/
 ├── docker-compose.yml       # Orquestador de servicios (App + DB)
 ├── README.md                # Documentación principal (este archivo)
-├── diagrama_eer.png         # Diagrama Entidad-Relación visual
 ├── app/
 │   ├── Dockerfile           # Imagen Python para la aplicación
 │   ├── main.py              # Menú interactivo con 20 consultas
@@ -396,5 +395,16 @@ docker-compose down
 docker system prune -a
 docker-compose up -d --build
 ```
+### ❌Error: "init.sql: Is a directory"
 
+**Síntoma**: En los logs aparece `could not read from input file: Is a directory`.
+**Causa**: Conflicto de volúmenes en Windows o archivo nombrado incorrectamente (`init.sql.txt`).
+**Solución**: Borra la carpeta errónea en `db/`, crea el archivo correctamente y ejecuta `docker-compose down -v`.
+
+ ### ❌Alternativa: Carga Manual de Datos (Workaround)
+**Situación**: Si la automatización falla y la base de datos queda vacía.
+**Solución**: Inyectar el script manualmente con el contenedor encendido:
+```bash
+docker cp db/init.sql algebra-relacional-db-1:/tmp/init.sql
+docker exec -it algebra-relacional-db-1 psql -U user -d algebra_db -f /tmp/init.sql```
 ---
