@@ -236,7 +236,7 @@ Cada consulta se presenta en **4 notaciones equivalentes**:
 ## 📂 Estructura del Repositorio
 
 ```
-proyecto-algebra-universitaria/
+practica-bd.algebra/
 ├── docker-compose.yml       # Orquestador de servicios (App + DB)
 ├── README.md                # Documentación principal (este archivo)
 ├── app/
@@ -276,8 +276,8 @@ docker-compose up -d --build
 **Salida esperada:**
 ```
 [+] Running 2/2
- ✔ Container proyecto-db-1   Started
- ✔ Container proyecto-app-1  Started
+ ✔ Container practica-db-1   Started
+ ✔ Container practica-app-1  Started
 ```
 
 #### 3️⃣ Acceder al menú interactivo
@@ -285,7 +285,7 @@ docker-compose up -d --build
 Una vez que los contenedores estén corriendo:
 
 ```bash
-docker attach proyecto-app-1
+docker attach practica-app-1
 ```
 
 > **Nota**: Si no aparece el menú inmediatamente, presiona **ENTER** una vez.
@@ -366,8 +366,8 @@ ports:
 docker ps -a
 
 # Reiniciar contenedor
-docker start proyecto-app-1
-docker attach proyecto-app-1
+docker start practica-app-1
+docker attach practica-app-1
 ```
 
 ### ❌ "Esperando a la BD..." por más de 30 segundos
@@ -377,7 +377,7 @@ docker attach proyecto-app-1
 **Solución**:
 ```bash
 # Ver logs de la base de datos
-docker logs proyecto-db-1
+docker logs practica-db-1
 
 # Reiniciar todo el stack
 docker-compose down
@@ -401,7 +401,7 @@ docker-compose up -d --build
 **Causa**: Conflicto de volúmenes en Windows o archivo nombrado incorrectamente (`init.sql.txt`).
 **Solución**: Borra la carpeta errónea en `db/`, crea el archivo correctamente y ejecuta `docker-compose down -v`.
 
- ### ❌Alternativa: Carga Manual de Datos (Workaround)
+ ### ❌Error: Carga Manual de Datos (Workaround)
 **Situación**: Si la automatización falla y la base de datos queda vacía.
 **Solución**: Inyectar el script manualmente con el contenedor encendido:
 ```bash
